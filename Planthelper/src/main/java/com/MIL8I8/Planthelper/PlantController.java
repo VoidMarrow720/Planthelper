@@ -19,6 +19,10 @@ public class PlantController {
         return repo.findAll();
     }
 
+    @PostMapping
+    public Plant addPlant(@RequestBody Plant plant) {
+        return repo.save(plant);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Plant> getById(@PathVariable Long id) {
         return repo.findById(id)
@@ -26,31 +30,4 @@ public class PlantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Plant add(@RequestBody Plant plant) {
-        // id-t nem küldünk — @GeneratedValue generálja
-        return repo.save(plant);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Plant> update(@PathVariable Long id, @RequestBody Plant update) {
-        return repo.findById(id).map(existing -> {
-            existing.setNev(update.getNev());
-            existing.setLatinNev(update.getLatinNev());
-            existing.setGid(update.getGid());
-            existing.setLid(update.getLid());
-            existing.setWid(update.getWid());
-            existing.setSid(update.getSid());
-            existing.setTid(update.getTid());
-            existing.setHid(update.getHid());
-            return ResponseEntity.ok(repo.save(existing));
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!repo.existsById(id)) return ResponseEntity.notFound().build();
-        repo.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
 }
