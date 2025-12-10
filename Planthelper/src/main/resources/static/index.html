@@ -73,6 +73,11 @@
 
   <div class="panel">
     <h3>Plants</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input id="plantSearch" placeholder="Search by name" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6" />
+      <button onclick="searchPlants()">Search</button>
+      <button type="button" class="secondary" onclick="clearSearch()">Clear</button>
+    </div>
     <div id="plantsList">(loading...)</div>
   </div>
 
@@ -279,11 +284,12 @@
       if(res.ok){ alert('Plant saved'); loadPlants(); } else { const txt = await res.text(); alert('Hiba mentéskor: '+txt); }
     }
 
-    async function loadPlants(){
-      const res = await fetch('/plants');
-      const arr = res.ok? await res.json():[];
+    let plantsCache = [];
+
+    function renderPlants(arr){
       const cont = document.getElementById('plantsList');
       cont.innerHTML = '';
+      if(!arr || arr.length === 0){ cont.innerHTML = '<i class="muted">(no plants)</i>'; return; }
       arr.forEach(p=>{
         const div = document.createElement('div');
         div.style.borderTop='1px solid #eee'; div.style.padding='8px 0';
@@ -295,11 +301,9 @@
         if(p.soils && p.soils.length) parts.push('Soil: '+ p.soils.map(x=>x.tipe||x.id).join(', '));
         if(p.temps && p.temps.length) parts.push('Temp: '+ p.temps.map(x=>x.tipe||x.id).join(', '));
         if(p.waters && p.waters.length) parts.push('Water: '+ p.waters.map(x=>x.tipe||x.id).join(', '));
-        // render text
         const text = document.createElement('span');
         text.innerHTML = parts.join(' | ');
         div.appendChild(text);
-        // add delete button
         const delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.style.marginLeft = '12px';
@@ -312,6 +316,25 @@
         div.appendChild(delBtn);
         cont.appendChild(div);
       });
+    }
+
+    async function loadPlants(){
+      const res = await fetch('/plants');
+      const arr = res.ok? await res.json():[];
+      plantsCache = arr || [];
+      renderPlants(plantsCache);
+    }
+
+    function searchPlants(){
+      const q = (document.getElementById('plantSearch').value||'').trim().toLowerCase();
+      if(!q){ renderPlants(plantsCache); return; }
+      const filtered = plantsCache.filter(p => (p.nev||'').toLowerCase().includes(q));
+      renderPlants(filtered);
+    }
+
+    function clearSearch(){
+      document.getElementById('plantSearch').value = '';
+      renderPlants(plantsCache);
     }
 
     // initial load
