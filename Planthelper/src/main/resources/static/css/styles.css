@@ -1,4 +1,4 @@
-/* Clean, minimal styles for Planthelper UI */
+/* Clean, minimal styles for Planthelper UI (duplicate for /css/styles.css) */
 :root{
   --bg: #ffffff;
   --panel-bg: #f7f7f8;
@@ -16,7 +16,7 @@ body{padding:20px;background-color:var(--bg)}
 
 /* Background image on body: place your image as repo root or static folder: bckgrnd.jpg */
 body{
-  background-image: url('bckgrnd.jpg');
+  background-image: url('/bckgrnd.jpg');
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center center;
