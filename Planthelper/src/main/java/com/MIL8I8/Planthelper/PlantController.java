@@ -101,4 +101,26 @@ public class PlantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        var optional = repo.findById(id);
+        if (optional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var plant = optional.get();
+        try {
+            plant.setGroup(null);
+            if (plant.getLites() != null) plant.getLites().clear();
+            if (plant.getWaters() != null) plant.getWaters().clear();
+            if (plant.getSoils() != null) plant.getSoils().clear();
+            if (plant.getTemps() != null) plant.getTemps().clear();
+            if (plant.getHums() != null) plant.getHums().clear();
+            repo.save(plant);
+            repo.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 }
