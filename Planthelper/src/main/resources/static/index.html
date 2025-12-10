@@ -18,26 +18,7 @@
 
   <div class="panel">
     <h3>Create reference entries</h3>
-    <div class="row">
-      <div>
-        <button onclick="showCreate('groups')">New Group</button>
-      </div>
-      <div>
-        <button onclick="showCreate('light')">New Lite</button>
-      </div>
-      <div>
-        <button onclick="showCreate('humidity')">New Hum</button>
-      </div>
-      <div>
-        <button onclick="showCreate('soils')">New Soil</button>
-      </div>
-      <div>
-        <button onclick="showCreate('temps')">New Temp</button>
-      </div>
-      <div>
-        <button onclick="showCreate('waters')">New Water</button>
-      </div>
-    </div>
+    
 
     <div id="createForm" style="display:none; margin-top:12px">
       <label id="createLabel">Create</label>
@@ -61,7 +42,7 @@
 
     <div class="row" style="margin-top:8px">
       <div style="flex:1">
-        <label>Group (single)</label>
+        <label>Group</label>
         <select id="selGroup"></select>
       </div>
       <div style="flex:1">
@@ -70,7 +51,7 @@
         <div style="margin-top:6px"><button type="button" onclick="addSelect('light')">Add</button></div>
       </div>
       <div style="flex:1">
-        <label>Hum</label>
+        <label>Humidity</label>
         <div id="humsContainer"></div>
         <div style="margin-top:6px"><button type="button" onclick="addSelect('hums')">Add</button></div>
       </div>
@@ -82,7 +63,7 @@
         <div style="margin-top:6px"><button type="button" onclick="addSelect('soils')">Add</button></div>
       </div>
       <div style="flex:1">
-        <label>Temp</label>
+        <label>Temperature</label>
         <div id="tempsContainer"></div>
         <div style="margin-top:6px"><button type="button" onclick="addSelect('temps')">Add</button></div>
       </div>
@@ -206,12 +187,12 @@
 
     function renderRefLists(){
       const types = [
-        {key:'groups', url:'/groups', title:'Groups'},
-        {key:'lites', url:'/lites', title:'Lites'},
-        {key:'hums', url:'/hums', title:'Hums'},
-        {key:'soils', url:'/soils', title:'Soils'},
-        {key:'temps', url:'/temps', title:'Temps'},
-        {key:'waters', url:'/waters', title:'Waters'}
+        {key:'groups', url:'/groups', title:'Group'},
+        {key:'lites', url:'/lites', title:'Light'},
+        {key:'hums', url:'/hums', title:'Humidity'},
+        {key:'soils', url:'/soils', title:'Soil'},
+        {key:'temps', url:'/temps', title:'Temperature'},
+        {key:'waters', url:'/waters', title:'Water  '}
       ];
       const root = document.getElementById('refsList');
       root.innerHTML = '';
