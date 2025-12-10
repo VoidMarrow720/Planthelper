@@ -4,8 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Plant {
@@ -15,29 +20,39 @@ public class Plant {
     private String nev;
     private String latinNev;
 
-    @ManyToOne
-    @JoinColumn(name = "Gid")
-    private Group group;
+        @ManyToOne
+        @JoinColumn(name = "Gid")
+        private Group group;
 
-    @ManyToOne
-    @JoinColumn(name = "Lid")
-    private Lite lite;
+        @ManyToMany
+        @JoinTable(name = "plant_lite",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "lite_id"))
+        private Set<Lite> lites = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "Wid")
-    private Water water;
+        @ManyToMany
+        @JoinTable(name = "plant_water",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "water_id"))
+        private Set<Water> waters = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "Sid")
-    private Soil soil;
+        @ManyToMany
+        @JoinTable(name = "plant_soil",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "soil_id"))
+        private Set<Soil> soils = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "Tid")
-    private Temp temp;
+        @ManyToMany
+        @JoinTable(name = "plant_temp",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "temp_id"))
+        private Set<Temp> temps = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "Hid")
-    private Hum hum;
+        @ManyToMany
+        @JoinTable(name = "plant_hum",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "hum_id"))
+        private Set<Hum> hums = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -70,44 +85,44 @@ public class Plant {
         this.group = group;
     }
 
-    public Lite getLite() {
-        return lite;
+    public Set<Lite> getLites() {
+        return lites;
     }
 
-    public void setLite(Lite lite) {
-        this.lite = lite;
+    public void setLites(Set<Lite> lites) {
+        this.lites = lites;
     }
 
-    public Water getWater() {
-        return water;
+    public Set<Water> getWaters() {
+        return waters;
     }
 
-    public void setWater(Water water) {
-        this.water = water;
+    public void setWaters(Set<Water> waters) {
+        this.waters = waters;
     }
 
-    public Soil getSoil() {
-        return soil;
+    public Set<Soil> getSoils() {
+        return soils;
     }
 
-    public void setSoil(Soil soil) {
-        this.soil = soil;
+    public void setSoils(Set<Soil> soils) {
+        this.soils = soils;
     }
 
-    public Temp getTemp() {
-        return temp;
+    public Set<Temp> getTemps() {
+        return temps;
     }
 
-    public void setTemp(Temp temp) {
-        this.temp = temp;
+    public void setTemps(Set<Temp> temps) {
+        this.temps = temps;
     }
 
-    public Hum getHum() {
-        return hum;
+    public Set<Hum> getHums() {
+        return hums;
     }
 
-    public void setHum(Hum hum) {
-        this.hum = hum;
+    public void setHums(Set<Hum> hums) {
+        this.hums = hums;
     }
 }
 

@@ -39,24 +39,56 @@ public class PlantController {
 
     @PostMapping
     public Plant addPlant(@RequestBody Plant plant) {
-        // Resolve references by id if provided to ensure managed entities
-        if (plant.getLite() != null && plant.getLite().getId() != null) {
-            liteRepo.findById(plant.getLite().getId()).ifPresent(plant::setLite);
-        }
-        if (plant.getWater() != null && plant.getWater().getId() != null) {
-            waterRepo.findById(plant.getWater().getId()).ifPresent(plant::setWater);
-        }
-        if (plant.getSoil() != null && plant.getSoil().getId() != null) {
-            soilRepo.findById(plant.getSoil().getId()).ifPresent(plant::setSoil);
-        }
-        if (plant.getTemp() != null && plant.getTemp().getId() != null) {
-            tempRepo.findById(plant.getTemp().getId()).ifPresent(plant::setTemp);
-        }
-        if (plant.getHum() != null && plant.getHum().getId() != null) {
-            humRepo.findById(plant.getHum().getId()).ifPresent(plant::setHum);
-        }
+        // Resolve single-valued Group
         if (plant.getGroup() != null && plant.getGroup().getId() != null) {
             groupRepo.findById(plant.getGroup().getId()).ifPresent(plant::setGroup);
+        }
+
+        // Resolve collection-valued references (lites, waters, soils, temps, hums)
+        if (plant.getLites() != null) {
+            var resolved = new java.util.HashSet<Lite>();
+            for (Lite l : plant.getLites()) {
+                if (l != null && l.getId() != null) {
+                    liteRepo.findById(l.getId()).ifPresent(resolved::add);
+                }
+            }
+            plant.setLites(resolved);
+        }
+        if (plant.getWaters() != null) {
+            var resolved = new java.util.HashSet<Water>();
+            for (Water w : plant.getWaters()) {
+                if (w != null && w.getId() != null) {
+                    waterRepo.findById(w.getId()).ifPresent(resolved::add);
+                }
+            }
+            plant.setWaters(resolved);
+        }
+        if (plant.getSoils() != null) {
+            var resolved = new java.util.HashSet<Soil>();
+            for (Soil s : plant.getSoils()) {
+                if (s != null && s.getId() != null) {
+                    soilRepo.findById(s.getId()).ifPresent(resolved::add);
+                }
+            }
+            plant.setSoils(resolved);
+        }
+        if (plant.getTemps() != null) {
+            var resolved = new java.util.HashSet<Temp>();
+            for (Temp t : plant.getTemps()) {
+                if (t != null && t.getId() != null) {
+                    tempRepo.findById(t.getId()).ifPresent(resolved::add);
+                }
+            }
+            plant.setTemps(resolved);
+        }
+        if (plant.getHums() != null) {
+            var resolved = new java.util.HashSet<Hum>();
+            for (Hum h : plant.getHums()) {
+                if (h != null && h.getId() != null) {
+                    humRepo.findById(h.getId()).ifPresent(resolved::add);
+                }
+            }
+            plant.setHums(resolved);
         }
 
         return repo.save(plant);

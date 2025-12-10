@@ -58,30 +58,35 @@
 
     <div class="row" style="margin-top:8px">
       <div style="flex:1">
-        <label>Group</label>
+        <label>Group (single)</label>
         <select id="selGroup"></select>
       </div>
       <div style="flex:1">
         <label>Lite</label>
-        <select id="selLite"></select>
+        <div id="litesContainer"></div>
+        <div style="margin-top:6px"><button type="button" onclick="addSelect('lites')">Add Lite</button></div>
       </div>
       <div style="flex:1">
         <label>Hum</label>
-        <select id="selHum"></select>
+        <div id="humsContainer"></div>
+        <div style="margin-top:6px"><button type="button" onclick="addSelect('hums')">Add Hum</button></div>
       </div>
     </div>
     <div class="row" style="margin-top:8px">
       <div style="flex:1">
         <label>Soil</label>
-        <select id="selSoil"></select>
+        <div id="soilsContainer"></div>
+        <div style="margin-top:6px"><button type="button" onclick="addSelect('soils')">Add Soil</button></div>
       </div>
       <div style="flex:1">
         <label>Temp</label>
-        <select id="selTemp"></select>
+        <div id="tempsContainer"></div>
+        <div style="margin-top:6px"><button type="button" onclick="addSelect('temps')">Add Temp</button></div>
       </div>
       <div style="flex:1">
         <label>Water</label>
-        <select id="selWater"></select>
+        <div id="watersContainer"></div>
+        <div style="margin-top:6px"><button type="button" onclick="addSelect('waters')">Add Water</button></div>
       </div>
     </div>
     <div style="margin-top:12px">
@@ -121,28 +126,75 @@
       } else alert('Hiba létrehozáskor');
     }
 
+    const optionsCache = { lites:[], hums:[], soils:[], temps:[], waters:[], groups:[] };
+
     async function loadAllRefs(){
       await Promise.all([
-        load('/groups', 'selGroup'),
-        load('/lites', 'selLite'),
-        load('/hums', 'selHum'),
-        load('/soils', 'selSoil'),
-        load('/temps', 'selTemp'),
-        load('/waters', 'selWater')
+        loadOptions('/groups', 'groups', 'selGroup'),
+        loadOptions('/lites', 'lites'),
+        loadOptions('/hums', 'hums'),
+        loadOptions('/soils', 'soils'),
+        loadOptions('/temps', 'temps'),
+        loadOptions('/waters', 'waters')
       ]);
+      // create initial selects (one each) for multiple containers
+      ensureInitialSelects();
     }
 
-    async function load(url, selectId){
+    async function loadOptions(url, key, singleSelectId){
       const res = await fetch(url);
       const arr = res.ok? await res.json() : [];
-      const sel = document.getElementById(selectId);
-      sel.innerHTML = '<option value="">-- none --</option>';
-      arr.forEach(it=>{
-        const opt = document.createElement('option');
-        opt.value = it.id;
-        opt.text = it.tipe || it.nev || ('#'+it.id);
-        sel.appendChild(opt);
+      optionsCache[key] = arr || [];
+      if(singleSelectId){
+        const sel = document.getElementById(singleSelectId);
+        sel.innerHTML = '<option value="">-- none --</option>';
+        arr.forEach(it=>{
+          const opt = document.createElement('option');
+          opt.value = it.id;
+          opt.text = it.tipe || it.nev || ('#'+it.id);
+          sel.appendChild(opt);
+        });
+      }
+      // refresh existing dynamic selects options
+      refreshDynamicSelects(key);
+    }
+
+    function refreshDynamicSelects(key){
+      const map = { lites:'litesContainer', hums:'humsContainer', soils:'soilsContainer', temps:'tempsContainer', waters:'watersContainer' };
+      const containerId = map[key];
+      if(!containerId) return;
+      const container = document.getElementById(containerId);
+      if(!container) return;
+      const selects = container.querySelectorAll('select');
+      selects.forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = '<option value="">-- none --</option>' + optionsCache[key].map(it=>`<option value="${it.id}">${it.tipe||it.nev||('#'+it.id)}</option>`).join('');
+        sel.value = cur;
       });
+    }
+
+    function ensureInitialSelects(){
+      ['lites','hums','soils','temps','waters'].forEach(key=>{
+        const map = { lites:'litesContainer', hums:'humsContainer', soils:'soilsContainer', temps:'tempsContainer', waters:'watersContainer' };
+        const container = document.getElementById(map[key]);
+        if(container && container.children.length === 0){
+          addSelect(key);
+        }
+      });
+    }
+
+    function addSelect(key){
+      const map = { lites:'litesContainer', hums:'humsContainer', soils:'soilsContainer', temps:'tempsContainer', waters:'watersContainer' };
+      const container = document.getElementById(map[key]);
+      if(!container) return;
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex'; wrapper.style.gap = '6px'; wrapper.style.marginTop = '6px';
+      const sel = document.createElement('select');
+      sel.innerHTML = '<option value="">-- none --</option>' + (optionsCache[key]||[]).map(it=>`<option value="${it.id}">${it.tipe||it.nev||('#'+it.id)}</option>`).join('');
+      const btn = document.createElement('button'); btn.type='button'; btn.innerText='Remove';
+      btn.onclick = ()=> wrapper.remove();
+      wrapper.appendChild(sel); wrapper.appendChild(btn);
+      container.appendChild(wrapper);
     }
 
     async function addPlant(){
@@ -150,15 +202,29 @@
       const latin = document.getElementById('pLatin').value.trim();
       if(!nev) return alert('Adj meg nevet');
       const payload = { nev, latinNev: latin };
-      const map = {
-        selGroup:'group', selLite:'lite', selHum:'hum', selSoil:'soil', selTemp:'temp', selWater:'water'
-      };
-      for(const selId in map){
-        const v = document.getElementById(selId).value;
-        if(v) payload[map[selId]] = { id: Number(v) };
+      const groupVal = document.getElementById('selGroup').value;
+      if(groupVal) payload.group = { id: Number(groupVal) };
+
+      // helper to collect ids from container
+      function collectIds(containerId){
+        const container = document.getElementById(containerId);
+        if(!container) return [];
+        const ids = [];
+        container.querySelectorAll('select').forEach(sel=>{
+          const v = sel.value;
+          if(v) ids.push({ id: Number(v) });
+        });
+        return ids;
       }
+
+      const lites = collectIds('litesContainer'); if(lites.length) payload.lites = lites;
+      const hums = collectIds('humsContainer'); if(hums.length) payload.hums = hums;
+      const soils = collectIds('soilsContainer'); if(soils.length) payload.soils = soils;
+      const temps = collectIds('tempsContainer'); if(temps.length) payload.temps = temps;
+      const waters = collectIds('watersContainer'); if(waters.length) payload.waters = waters;
+
       const res = await fetch('/plants', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-      if(res.ok){ alert('Plant saved'); loadPlants(); } else { alert('Hiba mentéskor'); }
+      if(res.ok){ alert('Plant saved'); loadPlants(); } else { const txt = await res.text(); alert('Hiba mentéskor: '+txt); }
     }
 
     async function loadPlants(){
@@ -169,15 +235,15 @@
       arr.forEach(p=>{
         const div = document.createElement('div');
         div.style.borderTop='1px solid #eee'; div.style.padding='8px 0';
-        const lines = [];
-        lines.push('<b>'+ (p.nev||'') +'</b> ('+(p.latinNev||'')+') - id:'+p.id);
-        if(p.group) lines.push('Group: '+(p.group.tipe||p.group.id));
-        if(p.lite) lines.push('Lite: '+(p.lite.tipe||p.lite.id));
-        if(p.hum) lines.push('Hum: '+(p.hum.tipe||p.hum.id));
-        if(p.soil) lines.push('Soil: '+(p.soil.tipe||p.soil.id));
-        if(p.temp) lines.push('Temp: '+(p.temp.tipe||p.temp.id));
-        if(p.water) lines.push('Water: '+(p.water.tipe||p.water.id));
-        div.innerHTML = lines.join(' | ');
+        const parts = [];
+        parts.push('<b>'+ (p.nev||'') +'</b> ('+(p.latinNev||'')+') - id:'+p.id);
+        if(p.group) parts.push('Group: '+(p.group.tipe||p.group.id));
+        if(p.lites && p.lites.length) parts.push('Lites: '+ p.lites.map(x=>x.tipe||x.id).join(', '));
+        if(p.hums && p.hums.length) parts.push('Hums: '+ p.hums.map(x=>x.tipe||x.id).join(', '));
+        if(p.soils && p.soils.length) parts.push('Soils: '+ p.soils.map(x=>x.tipe||x.id).join(', '));
+        if(p.temps && p.temps.length) parts.push('Temps: '+ p.temps.map(x=>x.tipe||x.id).join(', '));
+        if(p.waters && p.waters.length) parts.push('Waters: '+ p.waters.map(x=>x.tipe||x.id).join(', '));
+        div.innerHTML = parts.join(' | ');
         cont.appendChild(div);
       });
     }
