@@ -1,0 +1,48 @@
+/* Clean, minimal styles for Planthelper UI */
+:root{
+  --bg: #ffffff;
+  --panel-bg: #f7f7f8;
+  --border: #e6e6e6;
+  --text: #111;
+  --muted: #666;
+  --accent: #000; /* buttons: black */
+  --accent-contrast: #fff; /* button text: white */
+  --radius: 8px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:var(--text);background:var(--bg)}
+body{padding:20px}
+
+.row{display:flex;gap:12px;margin-bottom:12px;align-items:center}
+.panel{border:1px solid var(--border);padding:16px;border-radius:12px;margin-bottom:14px;background:var(--panel-bg)}
+
+label{display:block;margin:6px 0 6px;font-size:0.95rem;color:var(--muted)}
+input[type="text"], input, select, textarea{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;width:100%;outline:none}
+input:focus, select:focus, textarea:focus{box-shadow:0 0 0 3px rgba(0,0,0,0.04)}
+
+.flex{display:flex;gap:8px}
+
+button{appearance:none;-webkit-appearance:none;border:0;padding:8px 12px;border-radius:var(--radius);background:var(--accent);color:var(--accent-contrast);cursor:pointer;font-weight:600}
+button:hover{filter:brightness(1.05)}
+button:active{transform:translateY(1px)}
+
+/* Small variations */
+button[type="button"].secondary{background:#f0f0f0;color:var(--text);border:1px solid var(--border)}
+
+/* Plants list */
+#plantsList div{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid #efefef}
+#plantsList b{font-size:1.02rem}
+
+/* Ref boxes row */
+#refsList > div{display:flex;gap:16px;flex-wrap:wrap}
+#refsList .box{min-width:160px;border:1px solid var(--border);padding:8px;border-radius:8px;background:var(--panel-bg)}
+
+/* Responsive tweaks */
+@media (max-width:720px){
+  .row{flex-direction:column}
+  #refsList > div{flex-direction:column}
+}
+
+/* Utility */
+.muted{color:var(--muted)}
