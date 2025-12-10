@@ -1,8 +1,11 @@
 package com.MIL8I8.Planthelper;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Plant {
@@ -11,12 +14,30 @@ public class Plant {
     private Long id;
     private String nev;
     private String latinNev;
-    private int Gid;
-    private int Lid;
-    private int Wid;
-    private int Sid;
-    private int Tid;
-    private int Hid;
+
+    @ManyToOne
+    @JoinColumn(name = "Gid")
+    private Group group;
+
+    @ManyToOne
+    @JoinColumn(name = "Lid")
+    private Lite lite;
+
+    @ManyToOne
+    @JoinColumn(name = "Wid")
+    private Water water;
+
+    @ManyToOne
+    @JoinColumn(name = "Sid")
+    private Soil soil;
+
+    @ManyToOne
+    @JoinColumn(name = "Tid")
+    private Temp temp;
+
+    @ManyToOne
+    @JoinColumn(name = "Hid")
+    private Hum hum;
 
     public Long getId() {
         return id;
@@ -41,53 +62,52 @@ public class Plant {
     public void setLatinNev(String latinNev) {
         this.latinNev = latinNev;
     }
-
-    public int getGid() {
-        return Gid;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setGid(int gid) {
-        Gid = gid;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
-    public int getLid() {
-        return Lid;
+    public Lite getLite() {
+        return lite;
     }
 
-    public void setLid(int lid) {
-        Lid = lid;
+    public void setLite(Lite lite) {
+        this.lite = lite;
     }
 
-    public int getWid() {
-        return Wid;
+    public Water getWater() {
+        return water;
     }
 
-    public void setWid(int wid) {
-        Wid = wid;
+    public void setWater(Water water) {
+        this.water = water;
     }
 
-    public int getSid() {
-        return Sid;
+    public Soil getSoil() {
+        return soil;
     }
 
-    public void setSid(int sid) {
-        Sid = sid;
+    public void setSoil(Soil soil) {
+        this.soil = soil;
     }
 
-    public int getTid() {
-        return Tid;
+    public Temp getTemp() {
+        return temp;
     }
 
-    public void setTid(int tid) {
-        Tid = tid;
+    public void setTemp(Temp temp) {
+        this.temp = temp;
     }
 
-    public int getHid() {
-        return Hid;
+    public Hum getHum() {
+        return hum;
     }
 
-    public void setHid(int hid) {
-        Hid = hid;
+    public void setHum(Hum hum) {
+        this.hum = hum;
     }
 }
 
