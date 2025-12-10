@@ -47,6 +47,9 @@
         <button onclick="hideCreate()">Cancel</button>
       </div>
     </div>
+    <div id="refsList" style="margin-top:12px">
+      <!-- dynamic reference lists will be rendered here -->
+    </div>
   </div>
 
   <div class="panel">
@@ -139,6 +142,7 @@
       ]);
       // create initial selects (one each) for multiple containers
       ensureInitialSelects();
+      renderRefLists();
     }
 
     async function loadOptions(url, key, singleSelectId){
@@ -171,6 +175,8 @@
         sel.innerHTML = '<option value="">-- none --</option>' + optionsCache[key].map(it=>`<option value="${it.id}">${it.tipe||it.nev||('#'+it.id)}</option>`).join('');
         sel.value = cur;
       });
+      // also refresh the refs list view
+      renderRefLists();
     }
 
     function ensureInitialSelects(){
@@ -195,6 +201,51 @@
       btn.onclick = ()=> wrapper.remove();
       wrapper.appendChild(sel); wrapper.appendChild(btn);
       container.appendChild(wrapper);
+      renderRefLists();
+    }
+
+    function renderRefLists(){
+      const types = [
+        {key:'groups', url:'/groups', title:'Groups'},
+        {key:'lites', url:'/lites', title:'Lites'},
+        {key:'hums', url:'/hums', title:'Hums'},
+        {key:'soils', url:'/soils', title:'Soils'},
+        {key:'temps', url:'/temps', title:'Temps'},
+        {key:'waters', url:'/waters', title:'Waters'}
+      ];
+      const root = document.getElementById('refsList');
+      root.innerHTML = '';
+      types.forEach(t=>{
+        const box = document.createElement('div');
+        box.style.marginTop='8px';
+        box.innerHTML = `<b>${t.title}</b>`;
+        const list = document.createElement('div');
+        list.style.marginTop='6px';
+        const arr = optionsCache[t.key] || [];
+        if(arr.length===0) list.innerHTML='<i>(no items)</i>';
+        arr.forEach(it=>{
+          const row = document.createElement('div');
+          row.style.display='flex'; row.style.alignItems='center'; row.style.gap='8px'; row.style.marginTop='4px';
+          const label = document.createElement('span');
+          label.innerText = (it.tipe||it.nev||('#'+it.id));
+          const del = document.createElement('button');
+          del.type='button'; del.innerText='Delete';
+          del.onclick = async ()=>{ if(confirm('Törölni? '+(it.tipe||it.nev||it.id))){ await deleteRef(t.key, it.id); } };
+          row.appendChild(label); row.appendChild(del);
+          list.appendChild(row);
+        });
+        box.appendChild(list);
+        root.appendChild(box);
+      });
+    }
+
+    async function deleteRef(type, id){
+      const res = await fetch('/'+type+'/'+id, { method: 'DELETE' });
+      if(res.ok || res.status===204){
+        await loadAllRefs();
+      } else {
+        alert('Törlés sikertelen');
+      }
     }
 
     async function addPlant(){

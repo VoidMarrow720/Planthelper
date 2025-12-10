@@ -21,4 +21,8 @@ public class TempController {
     public Temp create(@RequestBody Temp temp) {
         return repo.save(temp);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }

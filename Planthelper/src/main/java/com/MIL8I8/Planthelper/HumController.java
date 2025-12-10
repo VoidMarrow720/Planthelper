@@ -21,4 +21,8 @@ public class HumController {
     public Hum create(@RequestBody Hum hum) {
         return repo.save(hum);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }

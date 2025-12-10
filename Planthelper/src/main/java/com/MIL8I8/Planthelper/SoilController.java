@@ -21,4 +21,8 @@ public class SoilController {
     public Soil create(@RequestBody Soil soil) {
         return repo.save(soil);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }

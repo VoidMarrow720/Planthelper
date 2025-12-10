@@ -21,4 +21,8 @@ public class GroupController {
     public Group create(@RequestBody Group group) {
         return repo.save(group);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }

@@ -21,4 +21,8 @@ public class WaterController {
     public Water create(@RequestBody Water water) {
         return repo.save(water);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }

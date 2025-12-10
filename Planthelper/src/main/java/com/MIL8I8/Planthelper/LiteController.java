@@ -21,4 +21,8 @@ public class LiteController {
     public Lite create(@RequestBody Lite lite) {
         return repo.save(lite);
     }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
 }
